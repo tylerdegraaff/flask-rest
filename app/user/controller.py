@@ -4,21 +4,20 @@ from flask_restplus import Resource
 
 from app.user.dto import UserDto
 from app.user.service import save_new_user, get_all_users, get_a_user
+from app.user import api
 
-api = UserDto.api
-_user = UserDto.user
 
 
 @api.route('/')
 class UserList(Resource):
     @api.doc('list_of_registered_users')
     # @admin_token_required
-    @api.marshal_list_with(_user, envelope='data')
+    @api.marshal_list_with(UserDto.user, envelope='data')
     def get(self):
         """List all registered users"""
         return get_all_users()
 
-    @api.expect(_user, validate=True)
+    @api.expect(UserDto.user, validate=True)
     @api.response(201, 'User successfully created.')
     @api.doc('create a new user')
     def post(self):
@@ -32,7 +31,7 @@ class UserList(Resource):
 @api.response(404, 'User not found.')
 class User(Resource):
     @api.doc('get a user')
-    @api.marshal_with(_user)
+    @api.marshal_with(UserDto.user)
     def get(self, public_id):
         """get a user given its identifier"""
         user = get_a_user(public_id)
